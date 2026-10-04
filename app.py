@@ -8,7 +8,7 @@ import cv2
 
 
 # ============================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # ============================================================
 
 st.set_page_config(
@@ -26,180 +26,167 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-    /* Main background */
-    .stApp {
-        background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
-    }
+.stApp {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+}
 
-    /* Main content width */
-    .block-container {
-        max-width: 1200px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+.block-container {
+    max-width: 1200px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
 
-    /* Header */
-    .hero {
-        padding: 2.2rem 2rem;
-        border-radius: 24px;
-        background: linear-gradient(135deg, #0f172a, #1e3a8a);
-        color: white;
-        margin-bottom: 2rem;
-        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.18);
-    }
+.hero {
+    padding: 2.2rem 2rem;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.18);
+}
 
-    .hero-title {
-        font-size: 42px;
-        font-weight: 800;
-        margin-bottom: 8px;
-        letter-spacing: -1px;
-    }
+.hero-title {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
 
-    .hero-subtitle {
-        font-size: 18px;
-        opacity: 0.9;
-        margin-bottom: 18px;
-    }
+.hero-subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 18px;
+}
 
-    .badge {
-        display: inline-block;
-        padding: 7px 14px;
-        margin-right: 8px;
-        margin-bottom: 5px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.14);
-        border: 1px solid rgba(255,255,255,0.2);
-        font-size: 13px;
-    }
+.badge {
+    display: inline-block;
+    padding: 7px 14px;
+    margin-right: 8px;
+    margin-bottom: 5px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 13px;
+}
 
-    /* Cards */
-    .card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 18px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
-        margin-bottom: 1rem;
-    }
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+    margin-bottom: 1rem;
+}
 
-    .card-title {
-        font-size: 21px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 10px;
-    }
+.card-title {
+    font-size: 21px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
 
-    .card-text {
-        color: #475569;
-        line-height: 1.7;
-    }
+.card-text {
+    color: #475569;
+    line-height: 1.7;
+}
 
-    /* Prediction card */
-    .prediction-card {
-        background: linear-gradient(135deg, #eff6ff, #ffffff);
-        padding: 1.8rem;
-        border-radius: 20px;
-        border: 1px solid #bfdbfe;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(30, 64, 175, 0.08);
-    }
+.prediction-card {
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
+    padding: 1.8rem;
+    border-radius: 20px;
+    border: 1px solid #bfdbfe;
+    text-align: center;
+}
 
-    .prediction-label {
-        color: #64748b;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+.prediction-label {
+    color: #64748b;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-    .prediction-class {
-        font-size: 42px;
-        font-weight: 800;
-        color: #1d4ed8;
-        margin: 8px 0;
-    }
+.prediction-class {
+    font-size: 42px;
+    font-weight: 800;
+    color: #1d4ed8;
+    margin: 8px 0;
+}
 
-    .confidence {
-        font-size: 20px;
-        font-weight: 700;
-        color: #0f172a;
-    }
+.confidence {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
 
-    /* Top prediction */
-    .top-item {
-        padding: 12px 15px;
-        margin: 8px 0;
-        border-radius: 12px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-    }
+.top-item {
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
 
-    /* Section headings */
-    .section-title {
-        font-size: 28px;
-        font-weight: 800;
-        color: #0f172a;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-    }
+.section-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
 
-    .section-subtitle {
-        color: #64748b;
-        margin-bottom: 1.5rem;
-    }
+.section-subtitle {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
 
-    /* Info boxes */
-    .info-box {
-        padding: 1.2rem;
-        border-radius: 15px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        text-align: center;
-    }
+.info-box {
+    padding: 1.2rem;
+    border-radius: 15px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
 
-    .info-value {
-        font-size: 22px;
-        font-weight: 750;
-        color: #1e3a8a;
-    }
+.info-value {
+    font-size: 22px;
+    font-weight: 750;
+    color: #1e3a8a;
+}
 
-    .info-label {
-        font-size: 13px;
-        color: #64748b;
-        margin-top: 5px;
-    }
+.info-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 5px;
+}
 
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: #64748b;
-        font-size: 13px;
-        padding: 2rem 0 1rem 0;
-    }
+.footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    padding: 2rem 0 1rem 0;
+}
 
-    /* Disclaimer */
-    .disclaimer {
-        padding: 1.2rem 1.4rem;
-        border-radius: 15px;
-        background: #fff7ed;
-        border: 1px solid #fed7aa;
-        color: #7c2d12;
-        margin-top: 2rem;
-    }
+.disclaimer {
+    padding: 1.2rem 1.4rem;
+    border-radius: 15px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #7c2d12;
+    margin-top: 2rem;
+}
 
-    /* Streamlit uploader */
-    [data-testid="stFileUploader"] {
-        background: white;
-        border-radius: 18px;
-        padding: 1rem;
-        border: 2px dashed #93c5fd;
-    }
+[data-testid="stFileUploader"] {
+    background: white;
+    border-radius: 18px;
+    padding: 1rem;
+    border: 2px dashed #93c5fd;
+}
 
 </style>
 """, unsafe_allow_html=True)
 
 
 # ============================================================
-# MODEL CONFIGURATION
+# CLASS NAMES
 # ============================================================
 
 class_names = [
@@ -270,7 +257,7 @@ model = load_model()
 
 
 # ============================================================
-# IMAGE TRANSFORMATION
+# TRANSFORMATION
 # ============================================================
 
 transform = transforms.Compose([
@@ -354,7 +341,7 @@ grad_cam = GradCAM(
 
 
 # ============================================================
-# PREDICTION FUNCTION
+# PREDICTION
 # ============================================================
 
 def predict_image(image):
@@ -394,7 +381,9 @@ def predict_image(image):
 
 def create_gradcam(image, cam):
 
-    original = np.array(image.convert("RGB"))
+    original = np.array(
+        image.convert("RGB")
+    )
 
     height, width = original.shape[:2]
 
@@ -436,7 +425,7 @@ with st.sidebar:
 
     st.markdown("## 🔬 SkinSight AI")
 
-    st.markdown(
+    st.write(
         "An explainable image classification "
         "demonstration using deep learning."
     )
@@ -445,7 +434,7 @@ with st.sidebar:
 
     st.markdown("### Model")
 
-    st.markdown("""
+    st.write("""
     **Architecture:** EfficientNet-B0
 
     **Explainability:** Grad-CAM
@@ -459,7 +448,7 @@ with st.sidebar:
 
     st.markdown("### Dataset")
 
-    st.markdown("""
+    st.write("""
     **ISIC 2018**
 
     Skin lesion image dataset used for
@@ -469,12 +458,12 @@ with st.sidebar:
     st.divider()
 
     st.caption(
-        "Developed as an educational AI/ML internship project."
+        "Educational AI/ML internship project."
     )
 
 
 # ============================================================
-# HERO HEADER
+# HERO
 # ============================================================
 
 st.markdown("""
@@ -499,7 +488,7 @@ st.markdown("""
 
 
 # ============================================================
-# INTRODUCTION
+# ANALYZE IMAGE
 # ============================================================
 
 st.markdown(
@@ -516,10 +505,6 @@ st.markdown(
 )
 
 
-# ============================================================
-# FILE UPLOAD
-# ============================================================
-
 uploaded_file = st.file_uploader(
     "📤 Upload a skin lesion image",
     type=["jpg", "jpeg", "png"],
@@ -528,20 +513,23 @@ uploaded_file = st.file_uploader(
 
 
 # ============================================================
-# ANALYSIS
+# RESULTS
 # ============================================================
 
 if uploaded_file is not None:
 
-    image = Image.open(uploaded_file).convert("RGB")
+    image = Image.open(
+        uploaded_file
+    ).convert("RGB")
 
     predicted_idx, confidence, probabilities, image_tensor = (
         predict_image(image)
     )
 
-    predicted_class = class_names[predicted_idx]
+    predicted_class = class_names[
+        predicted_idx
+    ]
 
-    # Grad-CAM
     cam = grad_cam.generate(
         image_tensor,
         predicted_idx
@@ -551,6 +539,7 @@ if uploaded_file is not None:
         image,
         cam
     )
+
 
     # --------------------------------------------------------
     # IMAGE + PREDICTION
@@ -570,7 +559,9 @@ if uploaded_file is not None:
 
         st.markdown(
             '<div class="card">'
-            '<div class="card-title">📷 Uploaded Image</div>',
+            '<div class="card-title">'
+            '📷 Uploaded Image'
+            '</div>',
             unsafe_allow_html=True
         )
 
@@ -584,6 +575,7 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
     with col2:
 
         st.markdown(
@@ -593,8 +585,10 @@ if uploaded_file is not None:
             '</div>'
             f'<div class="prediction-class">'
             f'{predicted_class}'
+            '</div>'
+            f'<div>'
+            f'{class_descriptions[predicted_class]}'
             f'</div>'
-            f'<div>{class_descriptions[predicted_class]}</div>'
             '<br>'
             '<div class="confidence">'
             f'Confidence: {confidence * 100:.2f}%'
@@ -606,13 +600,6 @@ if uploaded_file is not None:
         st.progress(
             float(confidence)
         )
-
-        st.write("")
-
-
-        # ----------------------------------------------------
-        # TOP 3
-        # ----------------------------------------------------
 
         st.markdown(
             '<div class="card">'
@@ -626,22 +613,31 @@ if uploaded_file is not None:
             probabilities
         )[::-1][:3]
 
-        for rank, idx in enumerate(top_indices):
+        for rank, idx in enumerate(
+            top_indices
+        ):
 
             probability = probabilities[idx]
 
             st.markdown(
                 f"""
                 <div class="top-item">
-                    <strong>#{rank + 1}
-                    &nbsp; {class_names[idx]}</strong>
+
+                    <strong>
+                    #{rank + 1}
+                    &nbsp; {class_names[idx]}
+                    </strong>
+
                     <span style="float:right;">
                     {probability * 100:.2f}%
                     </span>
+
                     <br>
+
                     <small>
                     {class_descriptions[class_names[idx]]}
                     </small>
+
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -658,7 +654,9 @@ if uploaded_file is not None:
     # ========================================================
 
     st.markdown(
-        '<div class="section-title">🧠 Explainable AI</div>',
+        '<div class="section-title">'
+        '🧠 Explainable AI'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -679,7 +677,9 @@ if uploaded_file is not None:
 
         st.markdown(
             '<div class="card">'
-            '<div class="card-title">Original Image</div>',
+            '<div class="card-title">'
+            'Original Image'
+            '</div>',
             unsafe_allow_html=True
         )
 
@@ -693,11 +693,14 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
     with cam_col2:
 
         st.markdown(
             '<div class="card">'
-            '<div class="card-title">Grad-CAM Visualization</div>',
+            '<div class="card-title">'
+            'Grad-CAM Visualization'
+            '</div>',
             unsafe_allow_html=True
         )
 
@@ -714,8 +717,8 @@ if uploaded_file is not None:
 
     st.info(
         "Grad-CAM is an explainability technique that "
-        "visualizes image regions that contributed to the "
-        "model's prediction."
+        "visualizes image regions that contributed to "
+        "the model's prediction."
     )
 
 
@@ -724,7 +727,9 @@ if uploaded_file is not None:
     # ========================================================
 
     st.markdown(
-        '<div class="section-title">📊 Model Information</div>',
+        '<div class="section-title">'
+        '📊 Model Information'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -735,8 +740,12 @@ if uploaded_file is not None:
         st.markdown(
             """
             <div class="info-box">
-                <div class="info-value">EfficientNet-B0</div>
-                <div class="info-label">Architecture</div>
+                <div class="info-value">
+                    EfficientNet-B0
+                </div>
+                <div class="info-label">
+                    Architecture
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -747,8 +756,12 @@ if uploaded_file is not None:
         st.markdown(
             """
             <div class="info-box">
-                <div class="info-value">7</div>
-                <div class="info-label">Classes</div>
+                <div class="info-value">
+                    7
+                </div>
+                <div class="info-label">
+                    Classes
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -759,8 +772,12 @@ if uploaded_file is not None:
         st.markdown(
             """
             <div class="info-box">
-                <div class="info-value">224×224</div>
-                <div class="info-label">Input Size</div>
+                <div class="info-value">
+                    224×224
+                </div>
+                <div class="info-label">
+                    Input Size
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -771,8 +788,12 @@ if uploaded_file is not None:
         st.markdown(
             """
             <div class="info-box">
-                <div class="info-value">Grad-CAM</div>
-                <div class="info-label">Explainability</div>
+                <div class="info-value">
+                    Grad-CAM
+                </div>
+                <div class="info-label">
+                    Explainability
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -786,7 +807,8 @@ else:
     # ========================================================
 
     st.markdown("""
-    <div class="card" style="text-align:center; padding:3rem;">
+    <div class="card"
+         style="text-align:center; padding:3rem;">
 
         <div style="font-size:55px;">
             🖼️
@@ -806,11 +828,13 @@ else:
 
 
 # ============================================================
-# ABOUT PROJECT
+# ABOUT
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">ℹ️ About the Project</div>',
+    '<div class="section-title">'
+    'ℹ️ About the Project'
+    '</div>',
     unsafe_allow_html=True
 )
 
