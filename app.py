@@ -1,4 +1,3 @@
-
 import streamlit as st
 import torch
 import torch.nn as nn
@@ -8,54 +7,77 @@ import numpy as np
 import cv2
 
 
-# ============================================================
-# PAGE CONFIGURATION
-# ============================================================
+# --------------------------------------------------
+# Page configuration
+# --------------------------------------------------
 
 st.set_page_config(
-    page_title="Skin Lesion Classification",
+    page_title="Explainable Skin Lesion Classification",
     page_icon="🔬",
     layout="wide"
 )
 
-
-# ============================================================
-# CLASS NAMES
-# ============================================================
-
-class_names = [
-    "MEL",
-    "NV",
-    "BCC",
-    "AKIEC",
-    "BKL",
-    "DF",
-    "VASC"
-]
-
-class_descriptions = {
-    "MEL": "Melanoma",
-    "NV": "Melanocytic nevus",
-    "BCC": "Basal cell carcinoma",
-    "AKIEC": "Actinic keratoses / intraepithelial carcinoma",
-    "BKL": "Benign keratosis-like lesion",
-    "DF": "Dermatofibroma",
-    "VASC": "Vascular lesion"
-}
-
-
-# ============================================================
-# DEVICE
-# ============================================================
-
-device = torch.device(
-    "cuda" if torch.cuda.is_available() else "cpu"
+st.title("🔬 Explainable Skin Lesion Classification")
+st.write(
+    "Educational image classification demo using EfficientNet-B0 "
+    "and Grad-CAM."
 )
 
 
-# ============================================================
-# IMAGE TRANSFORMATION
-# ============================================================
+# --------------------------------------------------
+# Device
+# --------------------------------------------------
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+# --------------------------------------------------
+# Model path
+# --------------------------------------------------
+
+model_path = "models/efficientnet_b0_skin_lesion.pth"
+
+
+# --------------------------------------------------
+# Load model
+# --------------------------------------------------
+
+@st.cache_resource
+def load_model():
+
+    checkpoint = torch.load(
+        model_path,
+        map_location=device
+    )
+
+    class_names = checkpoint["class_names"]
+
+    model = models.efficientnet_b0(weights=None)
+
+    num_features = model.classifier[1].in_features
+
+    model.classifier[1] = nn.Linear(
+        num_features,
+        len(class_names)
+    )
+
+    model.load_state_dict(
+        checkpoint["model_state_dict"]
+    )
+
+    model = model.to(device)
+
+    model.eval()
+
+    return model, class_names
+
+
+model, class_names = load_model()
+
+
+# --------------------------------------------------
+# Image preprocessing
+# --------------------------------------------------
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -67,47 +89,9 @@ transform = transforms.Compose([
 ])
 
 
-# ============================================================
-# MODEL
-# ============================================================
-
-@st.cache_resource
-def load_model():
-
-    model = models.efficientnet_b0(
-        weights=None
-    )
-
-    num_features = model.classifier[1].in_features
-
-    model.classifier[1] = nn.Linear(
-        num_features,
-        len(class_names)
-    )
-
-    model_path = "models/efficientnet_b0_skin_lesion.pth" 
-
-    checkpoint = torch.load(
-        model_path,
-        map_location=device
-    )
-
-    model.load_state_dict(
-        checkpoint["model_state_dict"]
-    )
-
-    model.to(device)
-    model.eval()
-
-    return model
-
-
-model = load_model()
-
-
-# ============================================================
-# GRAD-CAM
-# ============================================================
+# --------------------------------------------------
+# Grad-CAM
+# --------------------------------------------------
 
 class GradCAM:
 
@@ -119,39 +103,26 @@ class GradCAM:
         self.activations = None
         self.gradients = None
 
-        self.forward_hook = (
-            target_layer.register_forward_hook(
-                self.save_activation
-            )
+        self.forward_hook = target_layer.register_forward_hook(
+            self.save_activation
         )
 
-        self.backward_hook = (
-            target_layer.register_full_backward_hook(
-                self.save_gradient
-            )
+        self.backward_hook = target_layer.register_full_backward_hook(
+            self.save_gradient
         )
 
-    def save_activation(
-        self,
-        module,
-        input,
-        output
-    ):
-        self.activations = output.detach()
 
-    def save_gradient(
-        self,
-        module,
-        grad_input,
-        grad_output
-    ):
-        self.gradients = grad_output[0].detach()
+    def save_activation(self, module, input, output):
 
-    def generate(
-        self,
-        input_tensor,
-        class_idx
-    ):
+        self.activations = output
+
+
+    def save_gradient(self, module, grad_input, grad_output):
+
+        self.gradients = grad_output[0]
+
+
+    def generate(self, input_tensor, class_idx):
 
         self.model.zero_grad()
 
@@ -161,17 +132,16 @@ class GradCAM:
 
         score.backward()
 
-        gradients = self.gradients
-        activations = self.activations
+        gradients = self.gradients.detach()
+
+        activations = self.activations.detach()
 
         weights = gradients.mean(
             dim=(2, 3),
             keepdim=True
         )
 
-        cam = (
-            weights * activations
-        ).sum(dim=1)
+        cam = (weights * activations).sum(dim=1)
 
         cam = torch.relu(cam)
 
@@ -185,6 +155,10 @@ class GradCAM:
         return cam
 
 
+# --------------------------------------------------
+# Create Grad-CAM
+# --------------------------------------------------
+
 target_layer = model.features[-1]
 
 grad_cam = GradCAM(
@@ -193,54 +167,59 @@ grad_cam = GradCAM(
 )
 
 
-# ============================================================
-# PREDICTION
-# ============================================================
+# --------------------------------------------------
+# Prediction function
+# --------------------------------------------------
 
 def predict(image):
 
-    input_tensor = transform(image)
-    input_tensor = input_tensor.unsqueeze(0)
+    input_tensor = transform(image).unsqueeze(0)
+
     input_tensor = input_tensor.to(device)
 
-    model.eval()
+    input_tensor.requires_grad_(True)
 
-    with torch.no_grad():
+    output = model(input_tensor)
 
-        output = model(input_tensor)
-
-        probabilities = torch.softmax(
-            output,
-            dim=1
-        )
-
-    confidence, predicted_idx = torch.max(
-        probabilities,
+    probabilities = torch.softmax(
+        output,
         dim=1
-    )
+    )[0]
+
+    predicted_index = torch.argmax(
+        probabilities
+    ).item()
+
+    confidence = probabilities[
+        predicted_index
+    ].item()
 
     return (
         input_tensor,
-        predicted_idx.item(),
-        confidence.item(),
-        probabilities[0].cpu().numpy()
+        probabilities.detach().cpu().numpy(),
+        predicted_index,
+        confidence
     )
 
 
-# ============================================================
-# GRAD-CAM OVERLAY
-# ============================================================
+# --------------------------------------------------
+# Grad-CAM visualization
+# --------------------------------------------------
 
-def create_gradcam_overlay(
-    image,
-    cam
-):
+def create_gradcam(image, cam):
 
-    image_np = np.array(image)
+    original = np.array(image)
+
+    original = cv2.cvtColor(
+        original,
+        cv2.COLOR_RGB2BGR
+    )
+
+    height, width = original.shape[:2]
 
     cam = cv2.resize(
         cam,
-        (image.width, image.height)
+        (width, height)
     )
 
     heatmap = np.uint8(
@@ -252,13 +231,8 @@ def create_gradcam_overlay(
         cv2.COLORMAP_JET
     )
 
-    image_bgr = cv2.cvtColor(
-        image_np,
-        cv2.COLOR_RGB2BGR
-    )
-
     overlay = cv2.addWeighted(
-        image_bgr,
+        original,
         0.6,
         heatmap,
         0.4,
@@ -273,56 +247,15 @@ def create_gradcam_overlay(
     return overlay
 
 
-# ============================================================
-# HEADER
-# ============================================================
-
-st.title(
-    "🔬 Explainable Skin Lesion Classification"
-)
-
-st.subheader(
-    "EfficientNet-B0 + Grad-CAM"
-)
-
-st.write(
-    """
-    Upload a skin-lesion image to obtain an educational
-    image-classification prediction and a Grad-CAM
-    visualization.
-    """
-)
-
-
-# ============================================================
-# DISCLAIMER
-# ============================================================
-
-st.warning(
-    """
-    ⚠️ Educational Project Only
-
-    This application is intended for educational and
-    demonstration purposes only. It is not a medical
-    diagnostic tool and should not be used to make
-    healthcare decisions.
-    """
-)
-
-
-# ============================================================
-# UPLOAD
-# ============================================================
+# --------------------------------------------------
+# Upload image
+# --------------------------------------------------
 
 uploaded_file = st.file_uploader(
-    "Upload a skin image",
+    "Upload a skin lesion image",
     type=["jpg", "jpeg", "png"]
 )
 
-
-# ============================================================
-# PROCESS
-# ============================================================
 
 if uploaded_file is not None:
 
@@ -330,57 +263,67 @@ if uploaded_file is not None:
         uploaded_file
     ).convert("RGB")
 
+
+    # --------------------------------------------------
+    # Display uploaded image
+    # --------------------------------------------------
+
     st.subheader("Uploaded Image")
 
     st.image(
         image,
-        width=400
+        use_container_width=True
     )
 
-    (
-        input_tensor,
-        predicted_idx,
-        confidence,
-        probabilities
-    ) = predict(image)
+
+    # --------------------------------------------------
+    # Prediction
+    # --------------------------------------------------
+
+    with st.spinner("Analyzing image..."):
+
+        (
+            input_tensor,
+            probabilities,
+            predicted_index,
+            confidence
+        ) = predict(image)
+
+
+        cam = grad_cam.generate(
+            input_tensor,
+            predicted_index
+        )
+
+
+        gradcam_image = create_gradcam(
+            image,
+            cam
+        )
+
+
+    # --------------------------------------------------
+    # Prediction result
+    # --------------------------------------------------
 
     predicted_class = class_names[
-        predicted_idx
+        predicted_index
     ]
 
+    st.subheader("Prediction")
 
-    # ========================================================
-    # RESULT
-    # ========================================================
+    st.success(
+        f"Predicted Class: {predicted_class}"
+    )
 
-    st.subheader("Prediction Result")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        st.metric(
-            "Predicted Class",
-            predicted_class
-        )
-
-        st.write(
-            class_descriptions[
-                predicted_class
-            ]
-        )
-
-    with col2:
-
-        st.metric(
-            "Confidence",
-            f"{confidence:.2%}"
-        )
+    st.write(
+        f"Confidence: {confidence * 100:.2f}%"
+    )
 
 
-    # ========================================================
-    # TOP 3
-    # ========================================================
+    # --------------------------------------------------
+    # Top 3 predictions
+    # --------------------------------------------------
 
     st.subheader("Top 3 Predictions")
 
@@ -388,78 +331,47 @@ if uploaded_file is not None:
         probabilities
     )[::-1][:3]
 
-    for idx in top_indices:
+    for index in top_indices:
+
+        probability = probabilities[index]
 
         st.write(
-            f"**{class_names[idx]}** — "
-            f"{class_descriptions[class_names[idx]]}"
+            f"**{class_names[index]}** — "
+            f"{probability * 100:.2f}%"
         )
 
         st.progress(
-            float(probabilities[idx])
-        )
-
-        st.write(
-            f"{probabilities[idx]:.2%}"
+            float(probability)
         )
 
 
-    # ========================================================
-    # GRAD-CAM
-    # ========================================================
+    # --------------------------------------------------
+    # Grad-CAM
+    # --------------------------------------------------
 
-    st.subheader(
-        "Grad-CAM Explainability"
+    st.subheader("Grad-CAM Explanation")
+
+    st.image(
+        gradcam_image,
+        caption="Grad-CAM visualization",
+        use_container_width=True
     )
 
-    with st.spinner(
-        "Generating Grad-CAM..."
-    ):
-
-        cam = grad_cam.generate(
-            input_tensor,
-            predicted_idx
-        )
-
-        overlay = create_gradcam_overlay(
-            image,
-            cam
-        )
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        st.image(
-            image,
-            caption="Original Image",
-            use_container_width=True
-        )
-
-    with col2:
-
-        st.image(
-            overlay,
-            caption="Grad-CAM Visualization",
-            use_container_width=True
-        )
 
     st.info(
-        """
-        Grad-CAM highlights image regions that contributed
-        more strongly to the model's classification. It
-        should not be interpreted as a clinical explanation
-        or diagnosis.
-        """
+        "The Grad-CAM visualization highlights image regions "
+        "that contributed to the model's prediction."
     )
 
 
-# ============================================================
-# FOOTER
-# ============================================================
+# --------------------------------------------------
+# Disclaimer
+# --------------------------------------------------
 
-st.markdown("---")
+st.divider()
 
-st.caption(
-    "Internship Project | EfficientNet-B0 | Grad-CAM"
+st.warning(
+    "Disclaimer: This application is an educational machine-learning "
+    "demonstration and is not a medical diagnostic tool. Model predictions "
+    "should not be used for medical decisions."
 )
