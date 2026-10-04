@@ -800,7 +800,7 @@ if uploaded_file is not None:
         )
 
 
-else:
+#else:
 
     # ========================================================
     # EMPTY STATE
