@@ -806,25 +806,25 @@ else:
     # EMPTY STATE
     # ========================================================
 
-    st.markdown("""
-    <div class="card"
-         style="text-align:center; padding:3rem;">
+    #st.markdown("""
+    #<div class="card"
+     #    style="text-align:center; padding:3rem;">
 
-        <div style="font-size:55px;">
+      #  <div style="font-size:55px;">
             🖼️
-        </div>
+       # </div>
 
-        <div class="card-title">
-            Ready to Analyze
-        </div>
+        #<div class="card-title">
+         #   Ready to Analyze
+        #</div>
 
-        <div class="card-text">
-            Upload a JPG, JPEG, or PNG image above
-            to start the AI analysis.
-        </div>
+       # <div class="card-text">
+        #    Upload a JPG, JPEG, or PNG image above
+         #   to start the AI analysis.
+        #</div>
 
-    </div>
-    """, unsafe_allow_html=True)
+    #</div>
+   # """, unsafe_allow_html=True)
 
 
 # ============================================================
