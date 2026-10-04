@@ -811,7 +811,7 @@ else:
      #    style="text-align:center; padding:3rem;">
 
       #  <div style="font-size:55px;">
-            🖼️
+           # 🖼️
        # </div>
 
         #<div class="card-title">
