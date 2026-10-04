@@ -887,18 +887,23 @@ For health concerns, consult a qualified healthcare professional.
 # ============================================================
 # FOOTER
 # ============================================================
-
 st.markdown("""
-<div class="footer">
+<div class=hero>
 
-🔬 SkinSight AI &nbsp;•&nbsp;
-EfficientNet-B0 &nbsp;•&nbsp;
-Grad-CAM &nbsp;•&nbsp;
-Explainable AI
+    <div class=hero-title>
+        🔬 SkinSight AI
+    </div>
 
-<br><br>
+    <div class=hero-subtitle>
+        Explainable Skin Lesion Classification
+        using Deep Learning
+    </div>
 
-Educational Machine Learning Project
+    <span class=badge>EfficientNet-B0</span>
+    <span class=badge>Grad-CAM</span>
+    <span class=badge>ISIC 2018</span>
+    <span class=badge>Explainable AI</span>
 
 </div>
 """, unsafe_allow_html=True)
+
