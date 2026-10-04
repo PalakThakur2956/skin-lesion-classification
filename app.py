@@ -46,9 +46,10 @@ model_path = "models/efficientnet_b0_skin_lesion.pth"
 def load_model():
 
     checkpoint = torch.load(
-        model_path,
-        map_location=device
-    )
+    model_path,
+    map_location=device,
+    weights_only=False
+)
 
     class_names = checkpoint["class_names"]
 
