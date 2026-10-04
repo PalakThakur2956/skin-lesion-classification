@@ -466,25 +466,25 @@ with st.sidebar:
 # HERO
 # ============================================================
 
-st.markdown("""
-<div class="hero">
+#st.markdown("""
+#<div class="hero">
 
-    <div class="hero-title">
-        🔬 SkinSight AI
-    </div>
+ #   <div class="hero-title">
+  #      🔬 SkinSight AI
+   # </div>
 
-    <div class="hero-subtitle">
-        Explainable Skin Lesion Classification
-        using Deep Learning
-    </div>
+    #<div class="hero-subtitle">
+     #   Explainable Skin Lesion Classification
+      #  using Deep Learning
+    #</div>
 
-    <span class="badge">EfficientNet-B0</span>
-    <span class="badge">Grad-CAM</span>
-    <span class="badge">ISIC 2018</span>
-    <span class="badge">Explainable AI</span>
+    #<span class="badge">EfficientNet-B0</span>
+    #<span class="badge">Grad-CAM</span>
+    #<span class="badge">ISIC 2018</span>
+    #<span class="badge">Explainable AI</span>
 
-</div>
-""", unsafe_allow_html=True)
+#</div>
+#""", unsafe_allow_html=True)
 
 
 # ============================================================
@@ -887,23 +887,23 @@ For health concerns, consult a qualified healthcare professional.
 # ============================================================
 # FOOTER
 # ============================================================
-st.markdown("""
-<div class=hero>
+#st.markdown("""
+#<div class=hero>
+#
+ #   <div class=hero-title>
+  #      🔬 SkinSight AI
+   # </div>
 
-    <div class=hero-title>
-        🔬 SkinSight AI
-    </div>
+    #<div class=hero-subtitle>
+     #   Explainable Skin Lesion Classification
+      #  using Deep Learning
+    #</div>
 
-    <div class=hero-subtitle>
-        Explainable Skin Lesion Classification
-        using Deep Learning
-    </div>
+    #<span class=badge>EfficientNet-B0</span>
+    #<span class=badge>Grad-CAM</span>
+   # <span class=badge>ISIC 2018</span>
+    #<span class=badge>Explainable AI</span>
 
-    <span class=badge>EfficientNet-B0</span>
-    <span class=badge>Grad-CAM</span>
-    <span class=badge>ISIC 2018</span>
-    <span class=badge>Explainable AI</span>
-
-</div>
-""", unsafe_allow_html=True)
+#</div>
+#""", unsafe_allow_html=True)
 
